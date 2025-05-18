@@ -4,12 +4,13 @@ import axios from 'axios'
 const BASE_URL = 'http://localhost:8080'
 
 // Create axios instance with default config
-export const api = axios.create({
+ const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 })
+export default api;
 
 // Request interceptor to handle auth
 api.interceptors.request.use(

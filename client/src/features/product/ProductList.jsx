@@ -1,58 +1,41 @@
-// ProductList.jsx
-import React, { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { 
-  fetchProducts, 
-  selectAllProducts, 
-  selectProductStatus, 
-  selectProductError 
-} from '../../features/product/productSlice';
-import ProductCard from './ProductCard';
-import CircularProgress from '@mui/material/CircularProgress';
-import Alert from '@mui/material/Alert';
-import { Grid, Container, Typography } from '@mui/material';
+// src/features/product/ProductList.jsx
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProducts } from "./productSlice";
+import ProductCard from "./ProductCard";
+import { useLocation } from "react-router-dom";
+import {
+  CircularProgress,
+  Container,
+  Grid,
+  Typography,
+} from "@mui/material";
 
 const ProductList = () => {
-  const dispatch = useAppDispatch();
-  const products = useAppSelector(selectAllProducts);
-  const status = useAppSelector(selectProductStatus);
-  const error = useAppSelector(selectProductError);
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const categoryId = queryParams.get("category");
+
+  const { products, loading, error } = useSelector((state) => state.product);
 
   useEffect(() => {
-    // Only fetch products if not already loaded
-    if (status === 'idle') {
-      dispatch(fetchProducts());
-    }
-  }, [dispatch, status]);
-
-  if (status === 'loading') {
-    return (
-      <Container sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-        <CircularProgress />
-      </Container>
-    );
-  }
-
-  if (status === 'failed') {
-    return (
-      <Container sx={{ mt: 4 }}>
-        <Alert severity="error">Error loading products: {error}</Alert>
-      </Container>
-    );
-  }
+    dispatch(fetchProducts(categoryId)); // נשלח את מזהה הקטגוריה אם קיים
+  }, [dispatch, categoryId]);
 
   return (
-    <Container sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Our Products
+    <Container>
+      <Typography variant="h4" gutterBottom>
+        רשימת מוצרים
       </Typography>
-      
-      {products.length === 0 ? (
-        <Typography variant="body1">No products available.</Typography>
+      {loading ? (
+        <CircularProgress />
+      ) : error ? (
+        <Typography color="error">שגיאה: {error}</Typography>
       ) : (
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           {products.map((product) => (
-            <Grid item key={product.id} xs={12} sm={6} md={4} lg={3}>
+            <Grid item xs={12} sm={6} md={4} key={product.id}>
               <ProductCard product={product} />
             </Grid>
           ))}

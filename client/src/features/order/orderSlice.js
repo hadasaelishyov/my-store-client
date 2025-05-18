@@ -271,3 +271,10 @@ export const selectUserOrders = (state) => state.order.userOrders;
 export const selectOrderStatus = (state) => state.order.status;
 export const selectOrderError = (state) => state.order.error;
 export const selectPaymentStatus = (state) => state.order.paymentStatus;
+export const submitOrder = createAsyncThunk(
+  "order/submitOrder",
+  async (orderData) => {
+    const response = await axios.post("/orders", orderData);
+    return response.data;
+  }
+);
